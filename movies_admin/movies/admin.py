@@ -13,17 +13,17 @@ class PersonFilmworkInline(admin.TabularInline):
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'description')
 
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('full_name',)
 
 
 @admin.register(Filmwork)
 class FilmworkAdmin(admin.ModelAdmin):
-    inlines = (GenreFilmworkInline, PersonFilmwork)
+    inlines = (GenreFilmworkInline, PersonFilmworkInline)
     list_display = ('title', 'type', 'creation_date',
                     'rating', 'created', 'modified')
     list_filter = ('type', 'creation_date', 'genres')
