@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS content.person_film_work (
     id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
     person_id uuid NOT NULL,
     film_work_id uuid  NOT NULL,
-    role VARCHAR(255) NOT NULL,
+    role TEXT,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
