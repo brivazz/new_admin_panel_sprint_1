@@ -33,7 +33,7 @@ class Genre(UUIDMixin, TimeStampedMixin):
 
 
 class Person(UUIDMixin, TimeStampedMixin):
-    full_name = models.CharField(_('full name'), max_length=255)
+    full_name = models.CharField(_('full name'), max_length=255, db_index=True)
 
     class Meta:
         db_table = 'content\'.\'person'
@@ -49,9 +49,9 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         ('movie', _('Movie')),
         ('tv_show', _('TV Show')),
     )
-    title = models.TextField(_('title'))
+    title = models.TextField(_('title'), db_index=True)
     description = models.TextField(_('description'), blank=True)
-    creation_date = models.DateTimeField(_('creation date'))
+    creation_date = models.DateTimeField(_('creation date'), db_index=True)
     rating = models.FloatField(_('rating'), blank=True,
                                validators=[MinValueValidator(0),
                                            MaxValueValidator(100)])
@@ -80,7 +80,7 @@ class GenreFilmwork(UUIDMixin):
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey(Filmwork, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    role = models.TextField(_('role'), null=True)
+    role = models.TextField(_('role'), db_index=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:

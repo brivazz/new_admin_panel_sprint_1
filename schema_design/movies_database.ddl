@@ -57,19 +57,16 @@ ALTER TABLE content.person_film_work ADD CONSTRAINT fk_film_work
 FOREIGN KEY (film_work_id)
 REFERENCES content.film_work(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-CREATE CONCURRENTLY INDEX film_work_title_idx
+CREATE INDEX CONCURRENTLY film_work_title_idx
 ON content.film_work(title);
 
-CREATE CONCURRENTLY INDEX film_work_creation_date_idx
+CREATE INDEX CONCURRENTLY film_work_creation_date_idx
 ON content.film_work(creation_date);
 
-CREATE CONCURRENTLY INDEX genre_name_idx
-ON content.genre(name);
-
-CREATE CONCURRENTLY INDEX person_full_name_idx
+CREATE INDEX CONCURRENTLY person_full_name_idx
 ON content.person(full_name);
 
-CREATE CONCURRENTLY INDEX role_person_film_work_idx
+CREATE INDEX CONCURRENTLY role_person_film_work_idx
 ON content.person_film_work(role);
 
 ALTER ROLE app SET search_path TO content,public;
