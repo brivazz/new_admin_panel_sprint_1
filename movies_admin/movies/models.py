@@ -27,7 +27,7 @@ class Genre(UUIDMixin, TimeStampedMixin):
         db_table = 'content\'.\'genre'
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
-    
+
     def __str__(self):
         return self.name
 
@@ -51,7 +51,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     )
     title = models.TextField(_('title'))
     description = models.TextField(_('description'), blank=True)
-    creation_date = models.DateTimeField(_('creation date'), default=2023)
+    creation_date = models.DateTimeField(_('creation date'))
     rating = models.FloatField(_('rating'), blank=True,
                                validators=[MinValueValidator(0),
                                            MaxValueValidator(100)])
@@ -63,7 +63,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = 'content\'.\'film_work'
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
-    
+
     def __str__(self):
         return self.title
 
