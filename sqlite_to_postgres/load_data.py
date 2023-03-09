@@ -20,7 +20,8 @@ if __name__ == '__main__':
         'user': 'app',
         'password': '123qwe',
         'host': '127.0.0.1',
-        'port': 5432
+        'port': 5432,
+        'options': '-c search_path=content',
     }
     with sqlite3.connect('db.sqlite') as sqlite_conn, psycopg2.connect(
         **dsl, cursor_factory=DictCursor

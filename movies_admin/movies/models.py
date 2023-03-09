@@ -49,13 +49,13 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         ('movie', _('Movie')),
         ('tv_show', _('TV Show')),
     )
-    title = models.TextField(_('title'), db_index=True)
+    title = models.TextField(_('title'))
     description = models.TextField(_('description'), blank=True)
-    creation_date = models.DateTimeField(_('creation date'), db_index=True)
+    creation_date = models.DateTimeField(_('creation date'))
     rating = models.FloatField(_('rating'), blank=True,
                                validators=[MinValueValidator(0),
                                            MaxValueValidator(100)])
-    type = models.TextField(_('type'), choices=CHOICES)
+    film_type = models.TextField(_('film type'), choices=CHOICES)
     genres = models.ManyToManyField(Genre, through='GenreFilmwork')
     persons = models.ManyToManyField(Person, through='PersonFilmwork')
 
@@ -63,6 +63,12 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = 'content\'.\'film_work'
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'film_type'],
+                name='title_film_type_film_work_unique_idx'
+            )
+        ]
 
     def __str__(self):
         return self.title
@@ -75,6 +81,12 @@ class GenreFilmwork(UUIDMixin):
 
     class Meta:
         db_table = 'content\'.\'genre_film_work'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film_work', 'genre'],
+                name='film_work_genre_unique_idx'
+            )
+        ]
 
 
 class PersonFilmwork(UUIDMixin):
@@ -85,3 +97,9 @@ class PersonFilmwork(UUIDMixin):
 
     class Meta:
         db_table = 'content\'.\'person_film_work'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film_work', 'person', 'role'],
+                name='role_person_film_work_unique_idx'
+            )
+        ]

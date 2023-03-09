@@ -24,7 +24,7 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(Filmwork)
 class FilmworkAdmin(admin.ModelAdmin):
     inlines = (GenreFilmworkInline, PersonFilmworkInline)
-    list_display = ('title', 'type', 'creation_date',
+    list_display = ('title', 'film_type', 'creation_date',
                     'rating', 'created', 'modified')
-    list_filter = ('type', 'creation_date', 'genres')
+    list_filter = ('film_type', 'creation_date', 'genres')
     search_fields = ('title', 'description', 'id')
