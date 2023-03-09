@@ -63,11 +63,8 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = 'content\'.\'film_work'
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
-        constraints = [
-            models.UniqueConstraint(
-                fields=['title', 'film_type'],
-                name='title_film_type_film_work_unique_idx'
-            )
+        indexes = [
+            models.Index(fields=['title', 'film_type']),
         ]
 
     def __str__(self):
@@ -81,25 +78,21 @@ class GenreFilmwork(UUIDMixin):
 
     class Meta:
         db_table = 'content\'.\'genre_film_work'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['film_work', 'genre'],
-                name='film_work_genre_unique_idx'
-            )
+        indexes = [
+            models.Index(fields=['film_work', 'genre'],
+                         name='genre_film_work_idx'),
         ]
 
 
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey(Filmwork, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    role = models.TextField(_('role'), db_index=True)
+    role = models.TextField(_('role'))
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'content\'.\'person_film_work'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['film_work', 'person', 'role'],
-                name='role_person_film_work_unique_idx'
-            )
+        indexes = [
+            models.Index(fields=['role', 'person', 'film_work'],
+                         name='role_person_film_work_idx'),
         ]

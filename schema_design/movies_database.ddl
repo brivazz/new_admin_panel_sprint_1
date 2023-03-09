@@ -59,7 +59,7 @@ FOREIGN KEY (film_work_id)
 REFERENCES content.film_work(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE UNIQUE INDEX CONCURRENTLY
-IF NOT EXISTS title_film_type_film_work_unique_idx
+IF NOT EXISTS title_film_type_film_work_idx
 ON content.film_work(title, film_type);
 
 CREATE INDEX CONCURRENTLY
@@ -67,11 +67,11 @@ IF NOT EXISTS full_name_person_idx
 ON content.person(full_name);
 
 CREATE UNIQUE INDEX CONCURRENTLY
-IF NOT EXISTS genre_film_work_unique_idx
+IF NOT EXISTS genre_film_work_idx
 ON content.genre_film_work(genre_id, film_work_id);
 
 CREATE UNIQUE INDEX CONCURRENTLY
-IF NOT EXISTS role_person_film_work_unique_idx
+IF NOT EXISTS role_person_film_work_idx
 ON content.person_film_work(role, person_id, film_work_id);
 
 ALTER ROLE app SET search_path TO content,public;
