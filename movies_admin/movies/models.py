@@ -64,7 +64,8 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
         indexes = [
-            models.Index(fields=['title', 'film_type']),
+            models.Index(fields=['title', 'film_type'],
+                         name='title_film_type_film_work_idx'),
         ]
 
     def __str__(self):
