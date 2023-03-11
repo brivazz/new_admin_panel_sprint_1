@@ -13,7 +13,6 @@ def read_sqlite_tables_name(connection: sqlite3.Connection) -> tuple:
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type = \"table\"")
     list_of_table_names = [data[0] for data in cursor.fetchall()]
-    print(list_of_table_names)
     return list_of_table_names, cursor
 
 
