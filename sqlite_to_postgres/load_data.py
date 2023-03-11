@@ -158,37 +158,22 @@ class SQLiteExtractor:
         with open(f'{BASE_DIR/table_name}.csv', 'w', newline='') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(table_columns)
+            match table_name:
+                case 'person_film_work':
+                    writer.writerows([(i.id, i.film_work_id, i.person_id, i.role, i.created) for i in result])
+    
+                case 'person':
+                    writer.writerows([(i.id, i.full_name, i.created, i.modified) for i in result])
 
-            for i in result:
-                if table_name == 'person_film_work':
-                    writer.writerow(
-                        (
-                            i.id, i.film_work_id, i.person_id,
-                            i.role, i.created
-                        ))
-                elif table_name == 'person':
-                    writer.writerow(
-                        (
-                            i.id, i.full_name, i.created, i.modified
-                        ))
-                elif table_name == 'film_work':
-                    writer.writerow(
-                        (
-                            i.id, i.title, i.description,
-                            i.creation_date, i.rating,
-                            i.film_type, i.created, i.modified
-                        ))
-                elif table_name == 'genre_film_work':
-                    writer.writerow(
-                        (
-                            i.id, i.film_work_id, i.genre_id, i.created
-                        ))
-                elif table_name == 'genre':
-                    writer.writerow(
-                        (
-                            i.id, i.name, i.description,
-                            i.created, i.modified
-                        ))
+                case 'film_work':
+                    writer.writerows([(i.id, i.title, i.description, i.creation_date, i.rating, i.film_type, i.created, i.modified) for i in result])
+
+                case 'genre_film_work':
+                    writer.writerows([(i.id, i.film_work_id, i.genre_id, i.created) for i in result])
+
+                case 'genre':
+                    writer.writerows([(i.id, i.name, i.description, i.created, i.modified) for i in result])
+
 
     def extract_movies(self):
         self.read_sqlite_tables_name()
