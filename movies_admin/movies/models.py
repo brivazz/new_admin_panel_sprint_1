@@ -20,7 +20,7 @@ class UUIDMixin(models.Model):
 
 
 class Genre(UUIDMixin, TimeStampedMixin):
-    name = models.CharField(_('name'), max_length=255, unique=True)
+    name = models.CharField(_('name'), max_length=255)
     description = models.TextField(_('description'), blank=True)
 
     class Meta:
@@ -33,7 +33,7 @@ class Genre(UUIDMixin, TimeStampedMixin):
 
 
 class Person(UUIDMixin, TimeStampedMixin):
-    full_name = models.CharField(_('full name'), max_length=255, db_index=True)
+    full_name = models.CharField(_('full name'), max_length=255)
 
     class Meta:
         db_table = 'content\'.\'person'
@@ -63,10 +63,6 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = 'content\'.\'film_work'
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
-        indexes = [
-            models.Index(fields=['title', 'film_type'],
-                         name='title_film_type_film_work_idx'),
-        ]
 
     def __str__(self):
         return self.title
@@ -81,7 +77,7 @@ class GenreFilmwork(UUIDMixin):
         db_table = 'content\'.\'genre_film_work'
         indexes = [
             models.Index(fields=['film_work', 'genre'],
-                         name='genre_film_work_idx'),
+                         name='film_work_genre_idx'),
         ]
 
 
@@ -94,6 +90,6 @@ class PersonFilmwork(UUIDMixin):
     class Meta:
         db_table = 'content\'.\'person_film_work'
         indexes = [
-            models.Index(fields=['role', 'person', 'film_work'],
-                         name='role_person_film_work_idx'),
+            models.Index(fields=['film_work', 'person', 'role'],
+                         name='film_work_person_role__idx'),
         ]
