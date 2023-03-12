@@ -23,24 +23,28 @@ def test_check_sqlite_postgres_consistency(
         connection: sqlite3.Connection, pg_conn: _connection
 ):
     pg_cursor = pg_conn.cursor()
+
     connection.row_factory = sqlite3.Row
     sqlite_cursor = connection.cursor()
+
     list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
 
     print('\tSQLite\t', 'Postgres')
     for table_name in list_of_table_names:
-        sqlite_cursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
-        result_sqlite = sqlite_cursor.fetchone()
+        query = f"""SELECT COUNT(id) FROM {table_name}"""
 
-        pg_cursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
+        sqlite_cursor.execute(query)
+        result_sqlite = [i for i in sqlite_cursor.fetchone()]
+
+        pg_cursor.execute(query)
         result_pg = pg_cursor.fetchone()
+
         print('Записей:',
-              [i for i in result_sqlite],
+              result_sqlite,
               '==',
               result_pg,
               f'{table_name}')
 
-        result_sqlite = [i for i in result_sqlite]
         assert result_sqlite == result_pg
 
 
