@@ -64,7 +64,9 @@ class SQLiteExtractor:
             result = []
             match table_name:
                 case 'genre_film_work':
-                    table_columns = ['id', 'film_work_id', 'genre_id', 'created']
+                    table_columns = [
+                        'id', 'film_work_id', 'genre_id', 'created'
+                    ]
                     query = f"""SELECT
                                 id, film_work_id, genre_id, created_at
                                 FROM {table_name};"""
@@ -118,8 +120,8 @@ class SQLiteExtractor:
 
                 case 'film_work':
                     table_columns = [
-                        'id', 'title', 'description', 'creation_date', 'rating',
-                        'film_type', 'created', 'modified'
+                        'id', 'title', 'description', 'creation_date',
+                        'rating', 'film_type', 'created', 'modified'
                     ]
                     query = f"""SELECT
                                     id, title, description,
@@ -143,8 +145,10 @@ class SQLiteExtractor:
                     self.write_to_csv(result, table_name, table_columns)
 
                 case 'genre':
-                    table_columns = ['id', 'name', 'description',
-                                    'created', 'modified']
+                    table_columns = [
+                        'id', 'name', 'description',
+                        'created', 'modified'
+                    ]
                     query = f"""SELECT * FROM {table_name};"""
                     cursor.execute(query)
                     items = cursor.fetchall()
@@ -159,9 +163,14 @@ class SQLiteExtractor:
                         result.append(genre)
                     self.write_to_csv(result, table_name, table_columns)
 
+                case _:
+                    raise ValueError(f'Unknown table name: {table_name}')
+
     def write_to_csv(self, result: list, table_name: str, table_columns: list):
         with open(f'{BASE_DIR/table_name}.csv', 'w', newline='') as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=table_columns, extrasaction='ignore')
+            writer = csv.DictWriter(
+                csv_file, fieldnames=table_columns, extrasaction='ignore'
+            )
             writer.writeheader()
             match table_name:
                 case 'person_film_work':
@@ -206,7 +215,8 @@ class PostgresSaver:
             result = self.cursor.fetchone()
             print(
                 f'Результат выполнения команды COPY в таблицу: {table_name}',
-                  result, 'записей.')
+                result, 'записей.'
+            )
         except (errors.UniqueViolation, errors.InFailedSqlTransaction):
             return
 
