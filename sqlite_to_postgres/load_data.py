@@ -11,7 +11,7 @@ from psycopg2 import errors
 from schema import FilmWork, Genre, Person, GenreFilmWork, PersonFilmWork
 
 
-def drop_all_tables():
+def drop_all_schema_tables():
     with psycopg2.connect(**dsl) as pg_conn, pg_conn.cursor() as cursor:
         query = """DO $$ DECLARE
                     r RECORD;
@@ -57,103 +57,102 @@ class SQLiteExtractor:
     ):
         for table_name in list_of_table_names:
             result = []
-
-            if table_name == 'genre_film_work':
-                table_columns = ['id', 'film_work_id', 'genre_id', 'created']
-                query = f"""SELECT
+            match table_name:
+                case 'genre_film_work':
+                    table_columns = ['id', 'film_work_id', 'genre_id', 'created']
+                    query = f"""SELECT
                                 id, film_work_id, genre_id, created_at
-                            FROM {table_name};"""
-                cursor.execute(query)
-                items = cursor.fetchall()
-                for item in items:
-                    genre_film_work = GenreFilmWork(
-                        id=item[0],
-                        film_work_id=item[1],
-                        genre_id=item[2],
-                        created=item[3]
-                    )
-                    result.append(genre_film_work)
-                self.write_to_csv(result, table_name, table_columns)
+                                FROM {table_name};"""
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    for item in items:
+                        genre_film_work = GenreFilmWork(
+                            id=item[0],
+                            film_work_id=item[1],
+                            genre_id=item[2],
+                            created=item[3]
+                        )
+                        result.append(genre_film_work)
+                    self.write_to_csv(result, table_name, table_columns)
 
-            elif table_name == 'person_film_work':
-                table_columns = [
-                    'id', 'film_work_id', 'person_id', 'role', 'created'
-                ]
-                query = f"""SELECT
-                                id, film_work_id, person_id,
-                                role, created_at
-                            FROM {table_name};"""
-                cursor.execute(query)
-                items = cursor.fetchall()
-                for item in items:
-                    person_film_work = PersonFilmWork(
-                        id=item[0],
-                        film_work_id=item[1],
-                        person_id=item[2],
-                        role=item[3],
-                        created=item[4]
-                    )
-                    result.append(person_film_work)
-                self.write_to_csv(result, table_name, table_columns)
+                case 'person_film_work':
+                    table_columns = [
+                        'id', 'film_work_id', 'person_id', 'role', 'created'
+                    ]
+                    query = f"""SELECT
+                                    id, film_work_id, person_id,
+                                    role, created_at
+                                FROM {table_name};"""
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    for item in items:
+                        person_film_work = PersonFilmWork(
+                            id=item[0],
+                            film_work_id=item[1],
+                            person_id=item[2],
+                            role=item[3],
+                            created=item[4]
+                        )
+                        result.append(person_film_work)
+                    self.write_to_csv(result, table_name, table_columns)
 
-            elif table_name == 'person':
-                table_columns = ['id', 'full_name', 'created', 'modified']
-                query = f"""SELECT * FROM {table_name};"""
-                cursor.execute(query)
-                items = cursor.fetchall()
-                for item in items:
-                    person = Person(
-                        id=item[0],
-                        full_name=item[1],
-                        created=item[2],
-                        modified=item[3],
-                    )
-                    result.append(person)
-                self.write_to_csv(result, table_name, table_columns)
+                case 'person':
+                    table_columns = ['id', 'full_name', 'created', 'modified']
+                    query = f"""SELECT * FROM {table_name};"""
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    for item in items:
+                        person = Person(
+                            id=item[0],
+                            full_name=item[1],
+                            created=item[2],
+                            modified=item[3],
+                        )
+                        result.append(person)
+                    self.write_to_csv(result, table_name, table_columns)
 
-            elif table_name == 'film_work':
-                table_columns = [
-                    'id', 'title', 'description', 'creation_date', 'rating',
-                    'film_type', 'created', 'modified'
-                ]
-                query = f"""SELECT
-                                id, title, description,
-                                creation_date, rating,
-                                type, created_at, updated_at
-                            FROM {table_name};"""
-                cursor.execute(query)
-                items = cursor.fetchall()
-                for item in items:
-                    film_work = FilmWork(
-                        id=item[0],
-                        title=item[1],
-                        description=item[2],
-                        creation_date=item[3],
-                        rating=item[4],
-                        film_type=item[5],
-                        created=item[6],
-                        modified=item[7],
-                    )
-                    result.append(film_work)
-                self.write_to_csv(result, table_name, table_columns)
+                case 'film_work':
+                    table_columns = [
+                        'id', 'title', 'description', 'creation_date', 'rating',
+                        'film_type', 'created', 'modified'
+                    ]
+                    query = f"""SELECT
+                                    id, title, description,
+                                    creation_date, rating,
+                                    type, created_at, updated_at
+                                FROM {table_name};"""
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    for item in items:
+                        film_work = FilmWork(
+                            id=item[0],
+                            title=item[1],
+                            description=item[2],
+                            creation_date=item[3],
+                            rating=item[4],
+                            film_type=item[5],
+                            created=item[6],
+                            modified=item[7],
+                        )
+                        result.append(film_work)
+                    self.write_to_csv(result, table_name, table_columns)
 
-            elif table_name == 'genre':
-                table_columns = ['id', 'name', 'description',
-                                 'created', 'modified']
-
-                query = f"""SELECT * FROM {table_name};"""
-                cursor.execute(query)
-                items = cursor.fetchall()
-                for item in items:
-                    genre = Genre(
-                        id=item[0],
-                        name=item[1],
-                        description=item[2],
-                        created=item[3],
-                        modified=item[4]
-                    )
-                    result.append(genre)
-                self.write_to_csv(result, table_name, table_columns)
+                case 'genre':
+                    table_columns = ['id', 'name', 'description',
+                                    'created', 'modified']
+                    query = f"""SELECT * FROM {table_name};"""
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    for item in items:
+                        genre = Genre(
+                            id=item[0],
+                            name=item[1],
+                            description=item[2],
+                            created=item[3],
+                            modified=item[4]
+                        )
+                        result.append(genre)
+                    self.write_to_csv(result, table_name, table_columns)
 
     def write_to_csv(self, result: list, table_name: str, table_columns: list):
         with open(f'{BASE_DIR/table_name}.csv', 'w', newline='') as csv_file:
@@ -205,7 +204,7 @@ class PostgresSaver:
             return
 
     def save_all_data(self, data):
-        drop_all_tables()
+        drop_all_schema_tables()
         self.create_tables()
         for csv_file_path in data:
             self.fill_the_table(csv_file_path)
