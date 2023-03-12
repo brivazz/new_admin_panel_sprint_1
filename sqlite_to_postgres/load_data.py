@@ -1,3 +1,4 @@
+import os
 import csv
 from pathlib import Path
 from dataclasses import asdict
@@ -7,8 +8,12 @@ import psycopg2
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
 from psycopg2 import errors
+from dotenv import load_dotenv
 
 from schema import FilmWork, Genre, Person, GenreFilmWork, PersonFilmWork
+
+
+load_dotenv()
 
 
 def drop_all_schema_tables():
@@ -199,7 +204,9 @@ class PostgresSaver:
             self.cursor.copy_expert(query, open(csv_file_path, 'r'))
             self.cursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
             result = self.cursor.fetchone()
-            print(f'Результат выполнения команды COPY {table_name} ', result)
+            print(
+                f'Результат выполнения команды COPY в таблицу: {table_name}',
+                  result, 'записей.')
         except (errors.UniqueViolation, errors.InFailedSqlTransaction):
             return
 
@@ -218,11 +225,11 @@ if __name__ == '__main__':
     )
 
     dsl = {
-        'dbname': 'movies_database',
-        'user': 'app',
-        'password': '123qwe',
-        'host': '127.0.0.1',
-        'port': 5432,
+        'dbname': os.environ.get('DB_NAME'),
+        'user': os.environ.get('DB_USER'),
+        'password': os.environ.get('DB_PASSWORD'),
+        'host': os.environ.get('DB_HOST', '127.0.0.1'),
+        'port': os.environ.get('DB_PORT', 5432),
         'options': '-c search_path=content',
     }
 

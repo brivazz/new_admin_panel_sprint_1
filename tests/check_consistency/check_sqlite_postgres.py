@@ -1,9 +1,14 @@
+import os
 from pathlib import Path
 
 import sqlite3
 import psycopg2
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 def check_consistency_sqlite_postgres(
@@ -20,11 +25,11 @@ def check_consistency_sqlite_postgres(
     for table_name in list_of_table_names:
         sqlite_sursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
         result_sqlite = sqlite_sursor.fetchone()
-        print(f'Количество записей SQLite в таблице: {table_name} ', [i for i in result_sqlite], 'штук.')
+        print(f'SQLite в таблице: {table_name} ', [i for i in result_sqlite], 'записей.')
 
         pg_cursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
         result_pg = pg_cursor.fetchone()
-        print(f'Количество записей Postgres в таблице: {table_name} ', result_pg, 'штук.')
+        print(f'Postgres в таблице: {table_name} ', result_pg, 'записей.')
         print()
 
         result_sqlite = [i for i in result_sqlite]
@@ -32,17 +37,16 @@ def check_consistency_sqlite_postgres(
         assert result_sqlite == result_pg
 
 
-
 if __name__ == '__main__':
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
     db_sqlite_path = Path.joinpath(BASE_DIR, 'sqlite_to_postgres/db.sqlite')
 
     dsl = {
-        'dbname': 'movies_database',
-        'user': 'app',
-        'password': '123qwe',
-        'host': '127.0.0.1',
-        'port': 5432,
+        'dbname': os.environ.get('DB_NAME'),
+        'user': os.environ.get('DB_USER'),
+        'password': os.environ.get('DB_PASSWORD'),
+        'host': os.environ.get('DB_HOST', '127.0.0.1'),
+        'port': os.environ.get('DB_PORT', 5432),
         'options': '-c search_path=content',
     }
 
