@@ -13,7 +13,7 @@ from schema import FilmWork, Genre, Person, GenreFilmWork, PersonFilmWork
 load_dotenv()
 
 
-def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> tuple:
+def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> list:
     cursor.execute("SELECT name FROM sqlite_master WHERE type = \"table\"")
     list_of_table_names = [data[0] for data in cursor.fetchall()]
     return list_of_table_names
