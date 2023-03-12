@@ -11,30 +11,68 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def check_consistency_sqlite_postgres(
+def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> tuple:
+    cursor.execute("SELECT name FROM sqlite_master WHERE type = \"table\"")
+    list_of_table_names = [data[0] for data in cursor.fetchall()]
+    return list_of_table_names
+
+
+def test_check_sqlite_postgres_consistency(
         connection: sqlite3.Connection, pg_conn: _connection
 ):
     pg_cursor = pg_conn.cursor()
-
     connection.row_factory = sqlite3.Row
-    sqlite_sursor = connection.cursor()
+    sqlite_cursor = connection.cursor()
+    list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
 
-    sqlite_sursor.execute("SELECT name FROM sqlite_master WHERE type = \"table\"")
-    list_of_table_names = [data[0] for data in sqlite_sursor.fetchall()]
-
+    print('\tSQLite\t', 'Postgres')
     for table_name in list_of_table_names:
-        sqlite_sursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
-        result_sqlite = sqlite_sursor.fetchone()
-        print(f'SQLite в таблице: {table_name} ', [i for i in result_sqlite], 'записей.')
+        sqlite_cursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
+        result_sqlite = sqlite_cursor.fetchone()
 
         pg_cursor.execute(f"""SELECT COUNT(id) FROM {table_name}""")
         result_pg = pg_cursor.fetchone()
-        print(f'Postgres в таблице: {table_name} ', result_pg, 'записей.')
-        print()
-
+        print('Записей:',
+              [i for i in result_sqlite],
+              '==',
+              result_pg,
+              f'{table_name}'
+        )
         result_sqlite = [i for i in result_sqlite]
-
         assert result_sqlite == result_pg
+
+
+def test_checking_the_contents_of_table_entries(
+        connection: sqlite3.Connection, pg_conn: _connection
+):
+    pg_cursor = pg_conn.cursor()
+    connection.row_factory = sqlite3.Row
+    sqlite_cursor = connection.cursor()
+    list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
+
+    for table_name in list_of_table_names:
+        match table_name:
+            case 'film_work':
+                query = f"""SELECT
+                                id, title, description,
+                                creation_date, rating,
+                                type, created_at, updated_at
+                            FROM {table_name} where id = '3d825f60-9fff-4dfe-b294-1a45fa1e115d';"""
+                sqlite_cursor.execute(query)
+                # items_sqlite = sqlite_cursor.fetchone()
+                items_sqlite = [i for i in sqlite_cursor.fetchone()]
+                # print([i for i in sqlite_cursor.fetchone()])
+                print(items_sqlite)
+
+                query = f"""SELECT
+                                id, title, description,
+                                creation_date, rating,
+                                film_type, created, modified
+                            FROM {table_name}"""
+                pg_cursor.execute(query)
+                pg_items = pg_cursor.fetchone()
+                print(pg_items)
+                # assert items_sqlite == pg_items
 
 
 if __name__ == '__main__':
@@ -53,4 +91,5 @@ if __name__ == '__main__':
     with sqlite3.connect(db_sqlite_path) as sqlite_conn, psycopg2.connect(
         **dsl, cursor_factory=DictCursor
     ) as pg_conn:
-        check_consistency_sqlite_postgres(sqlite_conn, pg_conn)
+        # test_check_sqlite_postgres_consistency(sqlite_conn, pg_conn)
+        test_checking_the_contents_of_table_entries(sqlite_conn, pg_conn)
