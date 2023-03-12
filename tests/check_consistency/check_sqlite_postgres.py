@@ -226,6 +226,11 @@ def test_checking_the_contents_of_table_entries(
                     raise ValueError(f'Unknown table name: {table_name}')
 
 
+def main(sqlite_conn: sqlite3.Connection, pg_conn: _connection):
+    test_check_sqlite_postgres_consistency(sqlite_conn, pg_conn)
+    test_checking_the_contents_of_table_entries(sqlite_conn, pg_conn)
+
+
 if __name__ == '__main__':
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
     db_sqlite_path = Path.joinpath(BASE_DIR, 'sqlite_to_postgres/db.sqlite')
@@ -242,5 +247,4 @@ if __name__ == '__main__':
     with sqlite3.connect(db_sqlite_path) as sqlite_conn, psycopg2.connect(
         **dsl, cursor_factory=DictCursor
     ) as pg_conn:
-        test_check_sqlite_postgres_consistency(sqlite_conn, pg_conn)
-        test_checking_the_contents_of_table_entries(sqlite_conn, pg_conn)
+        main(sqlite_conn, pg_conn)
