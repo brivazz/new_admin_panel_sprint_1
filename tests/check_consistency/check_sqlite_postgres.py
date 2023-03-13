@@ -13,6 +13,17 @@ from schema import FilmWork, Genre, Person, GenreFilmWork, PersonFilmWork
 load_dotenv()
 
 
+def create_cursor_sqlite_and_postgres(
+        connection: sqlite3.Connection, pg_conn: _connection
+) -> tuple:
+    pg_cursor = pg_conn.cursor()
+
+    connection.row_factory = sqlite3.Row
+    sqlite_cursor = connection.cursor()
+
+    return sqlite_cursor, pg_cursor
+
+
 def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> list:
     cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
     list_of_table_names = [data[0] for data in cursor.fetchall()]
@@ -20,13 +31,8 @@ def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> list:
 
 
 def test_check_sqlite_postgres_consistency(
-        connection: sqlite3.Connection, pg_conn: _connection
+        sqlite_cursor: sqlite3.Cursor, pg_cursor: _connection.cursor
 ):
-    pg_cursor = pg_conn.cursor()
-
-    connection.row_factory = sqlite3.Row
-    sqlite_cursor = connection.cursor()
-
     list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
 
     print('\tSQLite\t', 'Postgres')
@@ -48,14 +54,9 @@ def test_check_sqlite_postgres_consistency(
         assert result_sqlite == result_pg
 
 
-def test_checking_the_contents_of_table_entries(
-        connection: sqlite3.Connection, pg_conn: _connection
+def test_checking_the_contents_of_tables_entries(
+        sqlite_cursor: sqlite3.Cursor, pg_cursor: _connection.cursor
 ):
-    pg_cursor = pg_conn.cursor()
-
-    connection.row_factory = sqlite3.Row
-    sqlite_cursor = connection.cursor()
-
     list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
 
     for table_name in list_of_table_names:
@@ -232,8 +233,11 @@ def test_checking_the_contents_of_table_entries(
 
 
 def main(sqlite_conn: sqlite3.Connection, pg_conn: _connection):
-    test_check_sqlite_postgres_consistency(sqlite_conn, pg_conn)
-    test_checking_the_contents_of_table_entries(sqlite_conn, pg_conn)
+    sqlite_cursor, pg_cursor = create_cursor_sqlite_and_postgres(
+        sqlite_conn, pg_conn
+    )
+    test_check_sqlite_postgres_consistency(sqlite_cursor, pg_cursor)
+    test_checking_the_contents_of_tables_entries(sqlite_cursor, pg_cursor)
 
 
 if __name__ == '__main__':

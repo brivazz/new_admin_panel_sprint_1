@@ -48,12 +48,12 @@ def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
 class SQLiteExtractor:
     def __init__(self, connection: sqlite3.Connection):
         self.connection = connection
+        self.cursor = self.connection.cursor()
 
     def read_sqlite_tables_name(self):
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
-        list_of_table_names = [data[0] for data in cursor.fetchall()]
-        self.extract_tables(list_of_table_names, cursor)
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+        list_of_table_names = [data[0] for data in self.cursor.fetchall()]
+        self.extract_tables(list_of_table_names, self.cursor)
 
     def extract_tables(
             self,
