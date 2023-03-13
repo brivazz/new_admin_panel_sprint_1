@@ -51,7 +51,7 @@ class SQLiteExtractor:
 
     def read_sqlite_tables_name(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type = \"table\"")
+        cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
         list_of_table_names = [data[0] for data in cursor.fetchall()]
         self.extract_tables(list_of_table_names, cursor)
 
@@ -68,7 +68,7 @@ class SQLiteExtractor:
                         'id', 'film_work_id', 'genre_id', 'created'
                     ]
                     query = f"""SELECT
-                                id, film_work_id, genre_id, created_at
+                                    id, film_work_id, genre_id, created_at
                                 FROM {table_name};"""
                     cursor.execute(query)
                     items = cursor.fetchall()
@@ -172,19 +172,9 @@ class SQLiteExtractor:
                 csv_file, fieldnames=table_columns, extrasaction='ignore'
             )
             writer.writeheader()
-            match table_name:
-                case 'person_film_work':
-                    writer.writerows({**asdict(i)} for i in result)
-                case 'person':
-                    writer.writerows({**asdict(i)} for i in result)
-                case 'film_work':
-                    writer.writerows({**asdict(i)} for i in result)
-                case 'genre_film_work':
-                    writer.writerows({**asdict(i)} for i in result)
-                case 'genre':
-                    writer.writerows({**asdict(i)} for i in result)
+            writer.writerows({**asdict(i)} for i in result)
 
-    def extract_movies(self):
+    def extract_movies(self) -> list:
         self.read_sqlite_tables_name()
         path_all_csv_files = sorted(Path.cwd().rglob('*.csv'))
         return path_all_csv_files
@@ -220,7 +210,7 @@ class PostgresSaver:
         except (errors.UniqueViolation, errors.InFailedSqlTransaction):
             return
 
-    def save_all_data(self, data):
+    def save_all_data(self, data: list):
         drop_all_schema_tables()
         self.create_tables()
         for csv_file_path in data:

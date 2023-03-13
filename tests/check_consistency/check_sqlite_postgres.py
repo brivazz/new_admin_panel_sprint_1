@@ -14,7 +14,7 @@ load_dotenv()
 
 
 def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> list:
-    cursor.execute("SELECT name FROM sqlite_master WHERE type = \"table\"")
+    cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
     list_of_table_names = [data[0] for data in cursor.fetchall()]
     return list_of_table_names
 
@@ -121,7 +121,8 @@ def test_checking_the_contents_of_table_entries(
                     )
 
                     sqlite_query = f"""SELECT
-                                        id, film_work_id, genre_id, created_at
+                                            id, film_work_id, genre_id,
+                                            created_at
                                        FROM {table_name}
                                        WHERE id = '{pg_id[0]}';"""
                     sqlite_cursor.execute(sqlite_query)
@@ -138,8 +139,8 @@ def test_checking_the_contents_of_table_entries(
 
                 case 'person_film_work':
                     pg_query = f"""SELECT
-                                    id, film_work_id, person_id,
-                                    role, created
+                                        id, film_work_id, person_id,
+                                        role, created
                                    FROM {table_name} WHERE id = '{pg_id[0]}'"""
                     pg_cursor.execute(pg_query)
 
@@ -153,8 +154,8 @@ def test_checking_the_contents_of_table_entries(
                     )
 
                     sqlite_query = f"""SELECT
-                                        id, film_work_id, person_id,
-                                        role, created_at
+                                            id, film_work_id, person_id,
+                                            role, created_at
                                        FROM {table_name}
                                        WHERE id = '{pg_id[0]}';"""
                     sqlite_cursor.execute(sqlite_query)
