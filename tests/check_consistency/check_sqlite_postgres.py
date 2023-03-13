@@ -31,7 +31,7 @@ def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> list:
 
 
 def test_check_sqlite_postgres_consistency(
-        sqlite_cursor: sqlite3.Cursor, pg_cursor: psycopg2.cursor
+        sqlite_cursor: sqlite3.Cursor, pg_cursor: _connection.cursor
 ):
     list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
 
@@ -55,7 +55,7 @@ def test_check_sqlite_postgres_consistency(
 
 
 def test_checking_the_contents_of_tables_entries(
-        sqlite_cursor: sqlite3.Cursor, pg_cursor: psycopg2.cursor
+        sqlite_cursor: sqlite3.Cursor, pg_cursor: _connection.cursor
 ):
     list_of_table_names = read_sqlite_tables_name(sqlite_cursor)
 
