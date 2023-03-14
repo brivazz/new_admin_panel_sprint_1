@@ -52,7 +52,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     title = models.TextField(_('title'))
     description = models.TextField(_('description'), blank=True)
     creation_date = models.DateTimeField(_('creation date'))
-    rating = models.FloatField(_('rating'), blank=True,
+    rating = models.FloatField(_('rating'), blank=True, default=0.0,
                                validators=[MinValueValidator(0),
                                            MaxValueValidator(100)])
     film_type = models.TextField(_('film type'), choices=CHOICES)
@@ -66,6 +66,14 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return self.title
+    
+    def get_queryset(self, request):
+        queryset = (
+            super()
+            .get_queryset(request)
+            .prefetch_related(*self.list_prefetch_related)
+        )
+        return queryset
 
 
 class GenreFilmwork(UUIDMixin):
@@ -82,9 +90,14 @@ class GenreFilmwork(UUIDMixin):
 
 
 class PersonFilmwork(UUIDMixin):
+    CHOICES = (
+        ('director', _('Director')),
+        ('screenwriter ', _('Screenwriter')),
+        ('actor', _('Actor')),
+    )
     film_work = models.ForeignKey(Filmwork, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    role = models.TextField(_('role'))
+    role = models.TextField(_('role'), choices=CHOICES)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
