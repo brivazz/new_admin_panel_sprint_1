@@ -156,11 +156,11 @@ class PostgresSaver:
     def insert_data(self, table_name, extract_data: list, dataclass):
         args = [astuple(item) for item in extract_data]
 
-        column = ','.join(dataclass.__dict__['__match_args__'])
-        tokens = ','.join(['%s'] * len(dataclass.__dict__['__match_args__']))
+        columns = ','.join(dataclass.__dict__['__match_args__'])
+        tokens = ','.join(['%s'] * len(columns.split(',')))
 
         query = f"""
-                INSERT INTO {table_name} ({column}) VALUES ({tokens})"""
+                INSERT INTO {table_name} ({columns}) VALUES ({tokens})"""
         try:
             execute_batch(self.cursor, query, args)
         except (errors.UniqueViolation, errors.InFailedSqlTransaction):
