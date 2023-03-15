@@ -1,4 +1,6 @@
 import os
+import contextlib
+from contextlib import contextmanager
 from pathlib import Path
 
 import sqlite3
@@ -11,17 +13,6 @@ from schema import FilmWork, Genre, Person, GenreFilmWork, PersonFilmWork
 
 
 load_dotenv()
-
-
-def create_cursor_sqlite_and_postgres(
-        connection: sqlite3.Connection, pg_conn: _connection
-) -> tuple:
-    pg_cursor = pg_conn.cursor()
-
-    connection.row_factory = sqlite3.Row
-    sqlite_cursor = connection.cursor()
-
-    return sqlite_cursor, pg_cursor
 
 
 def read_sqlite_tables_name(cursor: sqlite3.Cursor) -> list:
@@ -232,10 +223,17 @@ def test_checking_the_contents_of_tables_entries(
                     raise ValueError(f'Unknown table name: {table_name}')
 
 
-def main(sqlite_conn: sqlite3.Connection, pg_conn: _connection):
-    sqlite_cursor, pg_cursor = create_cursor_sqlite_and_postgres(
-        sqlite_conn, pg_conn
-    )
+@contextmanager
+def open_sqlite_db(db_sqlite_path: Path):
+    connection = sqlite3.connect(db_sqlite_path)
+    try:
+        yield connection.cursor()
+    finally:
+        connection.commit()
+        connection.close()
+
+
+def main(sqlite_cursor: sqlite3.Cursor, pg_cursor: _connection.cursor):
     test_check_sqlite_postgres_consistency(sqlite_cursor, pg_cursor)
     test_checking_the_contents_of_tables_entries(sqlite_cursor, pg_cursor)
 
@@ -244,7 +242,7 @@ if __name__ == '__main__':
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
     db_sqlite_path = Path.joinpath(BASE_DIR, 'sqlite_to_postgres/db.sqlite')
 
-    dsl = {
+    dsn = {
         'dbname': os.environ.get('DB_NAME'),
         'user': os.environ.get('DB_USER'),
         'password': os.environ.get('DB_PASSWORD'),
@@ -253,7 +251,7 @@ if __name__ == '__main__':
         'options': '-c search_path=content',
     }
 
-    with sqlite3.connect(db_sqlite_path) as sqlite_conn, psycopg2.connect(
-        **dsl, cursor_factory=DictCursor
-    ) as pg_conn:
-        main(sqlite_conn, pg_conn)
+    with open_sqlite_db(db_sqlite_path) as sqlite_cursor, contextlib.closing(
+        psycopg2.connect(**dsn, cursor_factory=DictCursor)
+    ) as pg_conn, pg_conn.cursor() as pg_cursor:
+        main(sqlite_cursor, pg_cursor)

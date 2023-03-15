@@ -7,19 +7,20 @@ from dataclasses import dataclass, field
 class MixinId:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
 
+
 @dataclass
 class MixinDate:
     created: datetime = field(default=datetime.now(timezone.utc))
     modified: datetime = field(default=datetime.now(timezone.utc))
 
 
-@dataclass
+@dataclass()
 class FilmWork(MixinId, MixinDate):
     title: str = field(default_factory=str)
-    film_type: str = field(default_factory=str)
     description: str = None
     creation_date: datetime = field(default=datetime.date(datetime.now()))
     rating: float = field(default=0.0)
+    film_type: str = field(default_factory=str)
 
 
 @dataclass
@@ -42,7 +43,7 @@ class GenreFilmWork(MixinId):
 
 @dataclass
 class PersonFilmWork(MixinId):
-    role: str = field(default_factory=str)
-    person_id: uuid.UUID = field(default_factory=uuid.UUID)
     film_work_id: uuid.UUID = field(default_factory=uuid.UUID)
+    person_id: uuid.UUID = field(default_factory=uuid.UUID)
+    role: str = field(default_factory=str)
     created: datetime = field(default=datetime.now(timezone.utc))

@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 class MixinId:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
 
+
 @dataclass
 class MixinDate:
     created: datetime = field(default=datetime.now(timezone.utc))

@@ -66,7 +66,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return self.title
-    
+
     def get_queryset(self, request):
         queryset = (
             super()
