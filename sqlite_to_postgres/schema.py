@@ -47,3 +47,12 @@ class PersonFilmWork(MixinId):
     person_id: uuid.UUID = field(default_factory=uuid.UUID)
     film_work_id: uuid.UUID = field(default_factory=uuid.UUID)
     created: datetime = field(default=datetime.now(timezone.utc))
+
+
+datatables_list = {
+    'film_work': FilmWork,
+    'person': Person,
+    'person_film_work': PersonFilmWork,
+    'genre': Genre,
+    'genre_film_work': GenreFilmWork,
+    }

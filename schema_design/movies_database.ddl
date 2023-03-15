@@ -1,9 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS content;
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS content.film_work (
-    id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
     creation_date DATE,
@@ -14,7 +12,7 @@ CREATE TABLE IF NOT EXISTS content.film_work (
 );
 
 CREATE TABLE IF NOT EXISTS content.genre (
-    id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -22,14 +20,14 @@ CREATE TABLE IF NOT EXISTS content.genre (
 );
 
 CREATE TABLE IF NOT EXISTS content.person (
-    id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     modified TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS content.genre_film_work (
-    id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     film_work_id uuid NOT NULL,
     genre_id uuid NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -37,7 +35,7 @@ CREATE TABLE IF NOT EXISTS content.genre_film_work (
 );
 
 CREATE TABLE IF NOT EXISTS content.person_film_work (
-    id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     film_work_id uuid NOT NULL,
     person_id uuid NOT NULL,
     role TEXT NOT NULL,
