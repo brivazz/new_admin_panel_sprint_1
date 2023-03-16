@@ -1,8 +1,8 @@
+import sqlite3
 from pathlib import Path
 from typing import List, Any
 from contextlib import contextmanager
 
-import sqlite3
 
 from settings import logger
 
